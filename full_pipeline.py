@@ -14,7 +14,11 @@ from sklearn.decomposition import PCA
 from gemma_client import OllamaClient
 from rul_forecaster import RULForecaster
 
-data_dir = '/mnt/c/Users/farha/Downloads/officedatavibration'
+# --- Configuration: set these env vars or edit the defaults ---
+data_dir = os.environ.get('DATA_DIR', './data')
+output_dir = os.environ.get('OUTPUT_DIR', './output')
+os.makedirs(output_dir, exist_ok=True)
+
 config_path = os.path.join(data_dir, 'device_config.json')
 
 with open(config_path, 'r') as f:
@@ -132,7 +136,7 @@ ax.set_xticklabels(corr_features, rotation=45)
 ax.set_yticklabels(corr_features)
 plt.title('Correlation Matrix (Angle vs RMS/Var)', pad=20)
 plt.tight_layout()
-plt.savefig('static/correlation_matrix.png')
+plt.savefig(os.path.join(output_dir, 'correlation_matrix.png'))
 plt.close()
 
 print("Scaling and PCA Orthogonalization (Full Data Visualization)...")
@@ -154,7 +158,7 @@ plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
 plt.legend(handles=scatter.legend_elements()[0], labels=['0-Degree', '90-Degree'])
 plt.grid(True)
-plt.savefig('static/pca_clusters.png')
+plt.savefig(os.path.join(output_dir, 'pca_clusters.png'))
 plt.close()
 
 print("Training XGBoost with 5-Fold Cross-Validation...")
@@ -197,7 +201,7 @@ plt.ylim(0.8, 1.05)
 plt.xticks(range(1, 6))
 plt.legend()
 plt.grid(True)
-plt.savefig('static/cv_accuracy.png')
+plt.savefig(os.path.join(output_dir, 'cv_accuracy.png'))
 plt.close()
 
 print("Saving Confusion Matrix Visualization...")
@@ -207,7 +211,7 @@ fig, ax = plt.subplots(figsize=(6, 5))
 disp.plot(cmap='Blues', values_format='d', ax=ax)
 plt.title('XGBoost 5-Fold Confusion Matrix')
 plt.tight_layout()
-plt.savefig('static/confusion_matrix.png')
+plt.savefig(os.path.join(output_dir, 'confusion_matrix.png'))
 plt.close()
 
 print("Forecasting with TimesFM...")
@@ -251,7 +255,7 @@ for idx, axis_name in enumerate(axes_names):
     axs[idx].grid(True)
 
 plt.tight_layout()
-plt.savefig('static/timesfm_forecast.png')
+plt.savefig(os.path.join(output_dir, 'timesfm_forecast.png'))
 plt.close()
 
 forecast_str = "\n".join(forecast_results)
@@ -288,5 +292,5 @@ output_data = {
         'label': df['label'].tolist()
     }
 }
-with open('static/pipeline.json', 'w') as f:
+with open(os.path.join(output_dir, 'pipeline.json'), 'w') as f:
     json.dump(output_data, f, indent=4)
