@@ -270,12 +270,13 @@ TimesFM Forecasts (Ticks until 1.5x max historical amplitude):
 
 Analyze the class separability and what the TimesFM ticks indicate about axis stability across orientations. Keep it very brief."""
 
-with open('gemma_prompt.txt', 'w') as f:
+prompt_path = os.path.join(output_dir, 'gemma_prompt.txt')
+with open(prompt_path, 'w') as f:
     f.write(prompt_text)
 
 gemma = OllamaClient()
 features_dict = {}
-response = gemma.diagnose(features_dict, 'gemma_prompt.txt')
+response = gemma.diagnose(features_dict, prompt_path)
 
 gemma_verdict = response.get('diagnosis', 'No response')
 print("\n--- Gemma Output ---")
